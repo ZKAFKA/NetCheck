@@ -44,7 +44,7 @@ int execCmd(const char* cmd, string& str) {
 
 int getIP(string& str) {
     execCmd("ipconfig", str);
-    regex pattern("IPv4 地址[\\s|. ]*: (.*)\\s");
+    regex pattern("以太网[\\S|\\s]*IPv4 地址[\\s|. ]*: (.*)\\s");
     smatch matches;
     if (regex_search(str, matches, pattern)) {
         str = matches[1].str();
@@ -57,7 +57,7 @@ int getIP(string& str) {
 
 int getGateway(string& str) {
     execCmd("ipconfig", str);
-    regex pattern("默认网关[\\s|. ]*: (.*)\\s");
+    regex pattern("以太网[\\S|\\s]*默认网关[\\s|. ]*: (.*)\\s");
     smatch matches;
     if (regex_search(str, matches, pattern)) {
         str = matches[1].str();
