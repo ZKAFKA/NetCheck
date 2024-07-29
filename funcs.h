@@ -37,7 +37,6 @@ int execCmd(const char* cmd, string& str) {
         return -1;
     }
     if (feof(pipe) != 0) {
-        printf_s("exec cmd:%s success", cmd);
         str.append(buf, ret);
     }
     return 0;
@@ -48,7 +47,6 @@ int getIP(string& str) {
     regex pattern("IPv4 地址[\\s|. ]*: (.*)\\s");
     smatch matches;
     if (regex_search(str, matches, pattern)) {
-        cout << "Found match: " << matches[1].str() << std::endl;
         str = matches[1].str();
     }
     else {
@@ -62,7 +60,6 @@ int getGateway(string& str) {
     regex pattern("默认网关[\\s|. ]*: (.*)\\s");
     smatch matches;
     if (regex_search(str, matches, pattern)) {
-        cout << "Found match: " << matches[1].str() << endl;
         str = matches[1].str();
     }
     else {
@@ -77,11 +74,11 @@ int getMAC(string& str, string my_gateway) {
     regex pattern(pattern_str);
     smatch matches;
     if (regex_search(str, matches, pattern)) {
-        cout << "Found match: " << matches[1].str() << endl;
         str = matches[1].str();
     } 
     else {
-        cout << "No match found." << endl;
+        // assign null value when not find the MAC address
+        str = "xx-xx-xx-xx-xx-xx";
     }
     return 0;
 }
@@ -89,29 +86,22 @@ int getMAC(string& str, string my_gateway) {
 int getLegalGateway(string& str) {
     regex pattern("\\d+.\\d+.\\d+.");
     smatch matches;
-    if (regex_search(str, matches, pattern)) {
-        str = matches.str().append("254");
-    }
-    else {
-        cout << "No match found." << endl;
-    }
+    regex_search(str, matches, pattern);
+    str = matches.str().append("254");
     return 0;
 }
 
 bool compareMACAddress(string str) {
-    cout << "Comparing..." << endl;
     string filename = "Addresses.txt";
     ifstream fin(filename);
     string strline;
     bool verify = false;
     while (getline(fin, strline))
     {
-        
-        cout << "文件读取" << strline << strline.size() << endl;
-        cout << "实际MAC地址" << str << str.size() <<endl;
-        if (strline == str) {
+        cout << "Comparing MAC Address" << strline.c_str()<< ":" << str.c_str() << endl;
+        if (strncmp(strline.c_str(), str.c_str(), 17)==0) {
             verify = true;
-            cout << "存在于清单中" << endl;
+            cout << "Verify！" << endl;
             break;
         }
     }
@@ -129,4 +119,12 @@ void trim(string& s)
             s.erase(index, 1);
         }
     }
+}
+
+int BlockNet() {
+    // Block the Network
+    string null_str;
+    execCmd("netsh interface set interface 以太网 disabled", null_str);
+    MessageBox(NULL, (LPCTSTR)TEXT("您的网络连接已被禁用，请联系科技运维人员解除"), (LPCTSTR)TEXT("提示"), MB_OK);
+    return 0;
 }
