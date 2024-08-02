@@ -39,6 +39,9 @@ int execCmd(const char* cmd, string& str) {
     if (feof(pipe) != 0) {
         str.append(buf, ret);
     }
+
+    // print
+    cout << "execCmd:" << str << endl;
     return 0;
 }
 
@@ -92,9 +95,10 @@ int getLegalGateway(string& str) {
 }
 
 bool compareMACAddress(string str) {
-    string filename = "Addresses.txt";
+    string filename = "C:\\UniAccessAgentDownloadData\\NetCheck\\Addresses.txt";
     ifstream fin(filename);
     string strline;
+    cout << "文件读取成功" << endl;
     bool verify = false;
     while (getline(fin, strline))
     {
@@ -127,4 +131,48 @@ int BlockNet() {
     execCmd("netsh interface set interface 以太网 disabled", null_str);
     MessageBox(NULL, (LPCTSTR)TEXT("您的网络连接已被禁用，请联系科技运维人员解除"), (LPCTSTR)TEXT("提示"), MB_OK);
     return 0;
+}
+
+
+void AutoStart()
+{
+    char programName[MAX_PATH] = { 0 };
+    DWORD dwRet = GetModuleFileName(NULL, (LPSTR)programName, MAX_PATH);
+    HKEY hKey = NULL;
+    DWORD rc;
+    rc = RegCreateKeyEx(HKEY_LOCAL_MACHINE,
+        "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Run",
+        0,
+        NULL,
+        REG_OPTION_NON_VOLATILE,
+        KEY_WOW64_64KEY | KEY_ALL_ACCESS,
+        NULL,
+        &hKey,
+        NULL);
+  
+    if (rc == ERROR_SUCCESS)
+    {
+        rc = RegSetValueEx(hKey,
+            "NetCheck",
+            0,
+            REG_SZ,
+            (const BYTE*)programName,
+            strlen(programName));
+        if (rc == ERROR_SUCCESS)
+        {
+            RegCloseKey(hKey);
+        }
+    }  
+}
+
+void HideWindow()
+{
+    HWND hwnd;
+    hwnd = FindWindow("ConsoleWindowClass", NULL);
+    if (hwnd)
+    {
+        ShowWindow(hwnd, SW_HIDE);
+    }
+    MessageBox(NULL, "Hello", "Notice", MB_OK);
+    system("pause");
 }
