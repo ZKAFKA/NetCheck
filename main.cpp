@@ -1,5 +1,5 @@
 #include"funcs.h"
-#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) // 设置入口地址
+#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) // 璁剧疆鍏ュ彛鍦板潃
 
 using namespace std;
 
@@ -30,15 +30,12 @@ int main() {
         // Compare Gateway
         if (my_gateway == legal_gateway) {
             // Compare MAC address
-            cout << "网关比对成功" << endl;
             string mac_address;
             getMAC(mac_address, my_gateway);
             trim(mac_address);
-            cout << "读取网关成功"<< mac_address << endl;
             bool verify = compareMACAddress(mac_address);
             if (verify == false) {
                 // Block the Network
-                cout << "MAC地址比对失败" << endl;
                 BlockNet();
             }
         }
